@@ -4,6 +4,7 @@ import "dotenv/config";
 import { User } from "../models/userModel.js";
 import { generateToken } from "../lib/utils.js";
 import { sendWelcomeEmail } from "../emails/emailHandlers.js";
+import cloudinary from "../lib/cloudinary.js";
 
 const signUpSchema = z.object({
   fullName: z.string().min(1, "FullName is required"),
@@ -105,5 +106,27 @@ export const login = async (req, res) => {
 
 export const logout = async (_, res) => {
   res.cookie("jwt", "", { maxAge: 0 });
-  res.status(200).json({ message: "Logges out sucessfully" });
+  res.status(200).json({ message: "Logged out sucessfully" });
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { profilePic } = req.body;
+    if (!profilePic)
+      return res.status(400).json({ message: "Profile Picture is required" });
+
+    const userId = req.user._id;
+
+    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profilePic: uploadResponse.secure_url },
+      { new: true },
+    );
+    res.status(200).json({ message: "User updated sucessfully", updatedUser });
+  } catch (err) {
+    console.log("Error in updateProfile controller :", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
 };
