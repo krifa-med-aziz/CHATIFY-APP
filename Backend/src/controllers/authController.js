@@ -1,7 +1,9 @@
 import z from "zod";
 import bcrypt from "bcryptjs";
+import "dotenv/config";
 import { User } from "../models/userModel.js";
 import { generateToken } from "../lib/utils.js";
+import { sendWelcomeEmail } from "../emails/emailHandlers.js";
 
 const signUpSchema = z.object({
   fullName: z.string().min(1, "FullName is required"),
@@ -36,14 +38,19 @@ export const signUp = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
-      fullName,
-      email,
+      fullName: fullName.trim(),
+      email: email.trim(),
       password: hashedPassword,
     });
 
     if (newUser) {
-      generateToken(newUser._id, res);
       await newUser.save();
+      generateToken(newUser._id, res);
+      await sendWelcomeEmail(
+        newUser.email,
+        newUser.fullName,
+        process.env.CLIENT_URL,
+      );
       return res
         .status(201)
         .json({ user: newUser, message: "User created successfully" });
