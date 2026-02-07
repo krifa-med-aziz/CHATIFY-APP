@@ -11,8 +11,12 @@ const signUpSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
 export const signUp = async (req, res) => {
-  const { fullName, email, password } = req.body;
   try {
     const validation = signUpSchema.safeParse(req.body);
 
@@ -28,7 +32,7 @@ export const signUp = async (req, res) => {
         errors: formattedErrors,
       });
     }
-
+    const { fullName, email, password } = validation.data;
     const user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "Email already exists" });
@@ -38,7 +42,7 @@ export const signUp = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
-      fullName: fullName.trim(),
+      fullName: fullName.trim().replace(/\s+/g, " "),
       email: email.trim(),
       password: hashedPassword,
     });
@@ -64,9 +68,42 @@ export const signUp = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  res.send("login route");
+  try {
+    const validation = loginSchema.safeParse(req.body);
+
+    if (!validation.success) {
+      const formattedErrors = validation.error.issues.reduce((acc, curr) => {
+        const field = curr.path[0];
+        if (field) acc[field] = curr.message;
+        return acc;
+      }, {});
+
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: formattedErrors,
+      });
+    }
+
+    const { email, password } = validation.data;
+
+    const user = await User.findOne({ email });
+
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect)
+      return res.status(400).json({ message: "Invalid credentials" });
+
+    generateToken(user._id, res);
+    return res
+      .status(200)
+      .json({ user: user, message: "User logged successfully" });
+  } catch (err) {
+    console.log("Error in login controller :", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
-export const logout = async (req, res) => {
-  res.send("logout route");
+export const logout = async (_, res) => {
+  res.cookie("jwt", "", { maxAge: 0 });
+  res.status(200).json({ message: "Logges out sucessfully" });
 };
