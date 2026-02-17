@@ -69,7 +69,6 @@ export const useAuthStore = create((set) => ({
       set({ authUser: resData });
       toast.success("Logged in successfully");
     } catch (err) {
-      console.log("Error in login:", err.message);
       toast.error(err.message);
     } finally {
       set({ isLoggingIn: false });
@@ -84,7 +83,6 @@ export const useAuthStore = create((set) => ({
       set({ authUser: null });
       toast.success("Logged out successfully");
     } catch (err) {
-      console.log("Error in logout:", err.message);
       toast.error(err.message);
     }
   },
