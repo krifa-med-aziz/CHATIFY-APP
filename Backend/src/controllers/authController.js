@@ -51,11 +51,11 @@ export const signUp = async (req, res) => {
     if (newUser) {
       await newUser.save();
       generateToken(newUser._id, res);
-      await sendWelcomeEmail(
-        newUser.email,
-        newUser.fullName,
-        process.env.CLIENT_URL,
-      );
+      // await sendWelcomeEmail(
+      //   newUser.email,
+      //   newUser.fullName,
+      //   process.env.CLIENT_URL,
+      // );
       return res
         .status(201)
         .json({ user: newUser, message: "User created successfully" });
