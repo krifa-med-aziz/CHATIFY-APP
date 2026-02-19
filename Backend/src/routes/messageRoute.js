@@ -6,14 +6,13 @@ import {
   getMessagesByUserId,
   sendMessage,
 } from "../controllers/messageController.js";
-import { arcjetProtection } from "../middleware/arcjetMiddleware.js";
 
-const messgaeRoutes = express.Router();
+const messageRoutes = express.Router();
 
-messgaeRoutes.use(arcjetProtection, protectedRoute);
-messgaeRoutes.get("/contact", getAllContacts);
-messgaeRoutes.get("/chats", getChatPartners);
-messgaeRoutes.get("/:id", getMessagesByUserId);
-messgaeRoutes.post("/send/:id", sendMessage);
+messageRoutes.use(protectedRoute);
+messageRoutes.get("/contacts", getAllContacts);
+messageRoutes.get("/chats", getChatPartners);
+messageRoutes.get("/:id", getMessagesByUserId);
+messageRoutes.post("/send/:id", sendMessage);
 
-export default messgaeRoutes;
+export default messageRoutes;

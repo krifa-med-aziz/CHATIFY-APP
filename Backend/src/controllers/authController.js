@@ -89,7 +89,10 @@ export const login = async (req, res) => {
 
     const user = await User.findOne({ email });
 
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    if (!user)
+      return res
+        .status(400)
+        .json({ message: "Email not found. Try to singup" });
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect)
       return res.status(400).json({ message: "Invalid credentials" });
