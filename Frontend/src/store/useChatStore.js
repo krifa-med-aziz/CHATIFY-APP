@@ -46,4 +46,16 @@ export const useChatStore = create((set) => ({
       set({ isUsersLoading: false });
     }
   },
+  getMessagesByUserId: async (userId) => {
+    set({ isMessagesLoading: false });
+    try {
+      const res = await fetch(`/api/messages/${userId}`);
+      const data = await res.json();
+      set({ messages: data });
+    } catch (err) {
+      toast.error("Something went wrong!");
+    } finally {
+      set({ isMessagesLoading: false });
+    }
+  },
 }));

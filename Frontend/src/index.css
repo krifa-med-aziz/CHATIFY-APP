@@ -2,7 +2,17 @@
 @plugin "daisyui";
 
 @property --border-angle {
-  inherits: false;
-  initial-value: 0deg;
   syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@theme {
+  --animate-border: border 4s linear infinite;
+
+  @keyframes border {
+    to {
+      --border-angle: 360deg;
+    }
+  }
 }
