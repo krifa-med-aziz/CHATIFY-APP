@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import { create } from "zustand";
 
 export const useChatStore = create((set) => ({
@@ -14,13 +15,13 @@ export const useChatStore = create((set) => ({
   getAllContacts: async () => {
     set({ isUsersLoading: true });
     try {
-      const res = await fetch("/messages/contacts");
+      const res = await fetch("/api/messages/contacts");
       if (!res.ok) {
         set({ allContacts: [] });
         return;
       }
       const data = await res.json();
-      set({ authUser: data });
+      set({ allContacts: data });
     } catch (err) {
       set({ allContacts: [] });
       toast.error(err.message);
@@ -31,7 +32,7 @@ export const useChatStore = create((set) => ({
   getChatPartners: async () => {
     set({ isUsersLoading: true });
     try {
-      const res = await fetch("/messages/chats");
+      const res = await fetch("/api/messages/chats");
       if (!res.ok) {
         set({ chats: [] });
         return;

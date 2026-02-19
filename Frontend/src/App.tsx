@@ -32,11 +32,10 @@ function App() {
             path="/login"
             element={!authUser ? <LoginPage /> : <Navigate to={"/"} />}
           />
-          {/* <Route
+          <Route
             path="/signup"
             element={!authUser ? <SignUpPage /> : <Navigate to={"/"} />}
-          /> */}
-          <Route path="/signup" element={<SignUpPage />} />
+          />
         </Routes>
       </div>
       <Toaster
